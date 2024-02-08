@@ -22,7 +22,7 @@
       <!-- Error messages -->
       <div v-if="error" class="error">{{ error }}</div>
       <!-- Registration button -->
-      <button type="submit" class="registration-button">Регистрация</button>
+      <button type="submit" class="registration-button">Зарегестрироваться</button>
     </form>
     <!-- Back button -->
     <button @click="goBack" class="back-button">На главную страницу</button>

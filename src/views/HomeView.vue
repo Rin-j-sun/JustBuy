@@ -24,7 +24,7 @@
     <div class="product" v-for="product in products" :key="product.id">
       <div class="product-info">
         <h3>{{ product.name }}</h3>
-        <img src="src/assets/img/product.jpeg" alt="Product" class="product-image">
+        <img :src="product.image" alt="Product" class="product-image">
         <p>{{ product.description }}</p>
         <p class="product-price">Цена: {{ product.price }} руб.</p>
       </div>
@@ -42,24 +42,24 @@ export default {
     return {
       // Список товаров из каталога
       products: [
-        {id: 1, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 2, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 3, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 4, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 5, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 6, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 7, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 8, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 9, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 10, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 11, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 12, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 13, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 14, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 15, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 16, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 17, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
-        {id: 18, name: 'Товар', description: 'Хороший товар', image: '', price: 111},
+        {id: 1, name: 'Товар', description: 'Хороший товар', image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 2, name: 'Товар', description: 'Хороший товар', image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 3, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 4, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 5, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 6, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 7, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 8, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 9, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 10, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 11, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 12, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 13, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 14, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 15, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 16, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 17, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
+        {id: 18, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
       ],
       // Статус авторизации пользователя
       isLoggedIn: false,

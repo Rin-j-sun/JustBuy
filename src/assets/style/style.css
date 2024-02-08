@@ -73,10 +73,11 @@ h1{
     flex-direction: column;
     flex-wrap: wrap;
     justify-content: space-between;
-    align-items: start;
+    align-content: center;
+    align-items: center;
     background-color: #AEC09A;
     width: 12rem;
-    height: 12rem;
+    height: 17rem;
 }
  /*контейнер карточек продукта*/
 .prod_containeer{

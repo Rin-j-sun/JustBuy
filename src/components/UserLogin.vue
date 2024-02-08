@@ -43,6 +43,8 @@ export default {
         })
       })
       const result = await response.json();
+      // перенаправление пользователя на главную страницу
+      this.$router.push('/')
       console.log('response: ', result);
       // if (savedUserData) {
       //   const userData = JSON.parse(savedUserData);

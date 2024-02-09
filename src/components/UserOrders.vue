@@ -20,28 +20,46 @@
   </div>
 </template>
 
-<script>
+<script >
 export default {
   data() {
     return {
-      orders: []
-    };
+      myOrders:[]
+    }
   },
   created() {
-    // Загружаем список заказов из localStorage при создании компонента
-    const savedOrders = localStorage.getItem('orders');
-    if (savedOrders) {
-      this.orders = JSON.parse(savedOrders);
-    }
+    this.getProductOrder();
   },
   methods: {
-    goBack() {
-      // Переход на домашний экран
-      this.$router.push('/');
-    }
+    async getProductOrder(){
+      const localToken = localStorage.getItem('userToken');
+      if(!localToken){
+        console.error('Токен отсутствует');
+        return;
+      }
+      const url = "https://jurapro.bhuser.ru/api-shop/order";
+      const response = await fetch(url,{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": `Bearer ${localToken}`
+        },
+
+      });
+      if (response.ok) {
+        const result = await response.json();
+        this.myOrders = result.data
+        console.log('Result: ', result)
+
+      } else {
+        this.error = "Ошибка получения оформленных заказов";
+        console.error(this.error);
+      }
+    },
   }
-};
+}
 </script>
+
 
 <!--<style scoped>-->
 

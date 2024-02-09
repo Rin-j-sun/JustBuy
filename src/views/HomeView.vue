@@ -36,95 +36,89 @@
 </template>
 
 <script>
+// @ is an alias to /src
+
+
 export default {
   name: 'HomeView',
   data() {
     return {
-      // Список товаров из каталога
-      products: [
-        {id: 1, name: 'Товар', description: 'Хороший товар', image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 2, name: 'Товар', description: 'Хороший товар', image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 3, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 4, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 5, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 6, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 7, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 8, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 9, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 10, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 11, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 12, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 13, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 14, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 15, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 16, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 17, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-        {id: 18, name: 'Товар', description: 'Хороший товар',image: require('@/assets/img/product.jpeg'), price: 111},
-      ],
-      // Статус авторизации пользователя
-      isLoggedIn: false,
-      // Роль пользователя (для демонстрации)
-      role: 'client', // Может быть 'client', 'admin' и т.д.
-      // Никнейм пользователя
-      username: ''
-    };
-  },
-  computed: {
-    // Проверка роли пользователя на клиента
-    isClient() {
-      return this.role === 'client';
+      products: [],
+      productsInCart: []
     }
-  },
-  methods: {
-    // Добавление товара в корзину (для демонстрации)
-    addToCart(product) {
-      // Создаем копию товара для корзины
-      const cartItem = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: 1 // При добавлении в корзину количество товара устанавливаем равным 1
-      };
 
-      // Загружаем корзину из localStorage
-      let cartItems = localStorage.getItem('cartItems');
-      cartItems = cartItems ? JSON.parse(cartItems) : [];
-
-      // Проверяем, есть ли уже такой товар в корзине
-      const existingItemIndex = cartItems.findIndex(item => item.id === cartItem.id);
-
-      if (existingItemIndex !== -1) {
-        // Если товар уже есть в корзине, увеличиваем его количество
-        cartItems[existingItemIndex].quantity++;
-      } else {
-        // Иначе добавляем новый товар в корзину
-        cartItems.push(cartItem);
-      }
-
-      // Сохраняем корзину в localStorage
-      localStorage.setItem('cartItems', JSON.stringify(cartItems));
-
-      console.log('Товар добавлен в корзину:', cartItem);
-    },
-    // Выход из аккаунта
-    logout() {
-      this.isLoggedIn = false;
-      this.username = '';
-      console.log('Выход из аккаунта');
-    }
   },
   created() {
-    // Проверяем, авторизован ли пользователь
-    const savedUserData = localStorage.getItem('userData');
-    if (savedUserData) {
-      const userData = JSON.parse(savedUserData);
-      this.isLoggedIn = true;
-      this.username = userData.username;
+    this.getProduct();
+  },
+  methods:{
+    async getProduct(){
+      const url = "https://jurapro.bhuser.ru/api-shop/products";
+      const response = await fetch(url,{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+
+      });
+      if (response.ok) {
+        const result = await response.json();
+        this.products = result.data
+        console.log('Result: ', result)
+      } else {
+        this.error = "Ошибка";
+        console.error(this.error);
+      }
+
+
+    },
+    async addToCart(product) {
+      const productId = product.id;
+      const url = `https://jurapro.bhuser.ru/api-shop/cart/${productId}`;
+      const userToken = localStorage.getItem('userToken');
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${userToken}`
+          }
+        });
+        if (response.ok) {
+          const existingItemIndex = this.productsInCart.findIndex(item => item.id === product.id);
+          if (existingItemIndex !== -1 && this.productExists(this.productsInCart[existingItemIndex], product)) {
+            this.productsInCart[existingItemIndex].quantity++;
+          } else {
+            this.productsInCart.push({...product, quantity: 1});
+          }
+          const data = await response.json();
+          console.log(data.data.message);
+        } else {
+          console.error("Ошибка добавления товара в корзину:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Ошибка добавления товара в корзину:", error);
+      }
+    },
+    productExists(item1, item2) {
+      // Функция для проверки идентичности товаров
+      return item1.id === item2.id && item1.name === item2.name && item1.description === item2.description && item1.price === item2.price;
+    },
+
+    logout(){
+      localStorage.removeItem('userToken');
+      this.$router.push('/');
+
+    }
+  },
+  computed: {
+    isAuthenticated() {
+      return !!localStorage.getItem('userToken');
     }
   }
-};
-</script>
 
+}
+</script>
 <!--<style scoped>-->
 <!--/* Стили*/-->
 

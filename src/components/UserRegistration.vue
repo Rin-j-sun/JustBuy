@@ -12,12 +12,12 @@
         <input type="email" id="email" v-model="email" required>
       </div>
       <div class="form-group">
-        <label for="password">Пароль:</label>
-        <input type="password" id="password" v-model="password" required>
+        <label for="confirmPassword">Пароль:</label>
+        <input type="confirmPassword" id="confirmPassword" v-model="confirmPassword" required>
       </div>
       <div class="form-group">
-        <label for="confirmPassword">Повторите пароль:</label>
-        <input type="password" id="confirmPassword" v-model="confirmPassword" required>
+        <label for="confirmconfirmPassword">Повторите пароль:</label>
+        <input type="confirmPassword" id="confirmconfirmPassword" v-model="confirmconfirmPassword" required>
       </div>
       <!-- Error messages -->
       <div v-if="error" class="error">{{ error }}</div>
@@ -35,56 +35,39 @@ export default {
     return {
       username: '',
       email: '',
-      password: '',
       confirmPassword: '',
       error: ''
-    };
+    }
   },
   methods: {
-    registerUser() {
-      // Проверяем, есть ли пользователь с таким же никнеймом или почтой уже зарегистрирован
-      const savedUserData = localStorage.getItem('userData');
-      if (savedUserData) {
-        const userData = JSON.parse(savedUserData);
-        if (userData.username === this.username) {
-          // Если пользователь с таким же никнеймом уже зарегистрирован, выводим сообщение об ошибке
-          this.error = 'Пользователь с таким никнеймом уже зарегистрирован';
-          return; // Прерываем выполнение метода, чтобы избежать сохранения нового пользователя
-        }
-        if (userData.email === this.email) {
-          // Если пользователь с такой же почтой уже зарегистрирован, выводим сообщение об ошибке
-          this.error = 'Пользователь с такой почтой уже зарегистрирован';
-          return; // Прерываем выполнение метода, чтобы избежать сохранения нового пользователя
-        }
+    async register() {
+      const url = "https://jurapro.bhuser.ru/api-shop/signup";
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: this.username,
+          email: this.email,
+          confirmPassword: this.confirmPassword
+        })
+      });
+      if (response.ok) {
+        this.$router.push('/login'); // Перенаправляем пользователя на авторизацию
+      } else {
+        this.error = "Ошибка при регистрации";
+        console.error('Ошибка:', this.error);
       }
 
-      // Сохраняем данные нового пользователя в локальное хранилище
-      const userData = {
-        username: this.username,
-        email: this.email,
-        password: this.password
-      };
-      localStorage.setItem('userData', JSON.stringify(userData));
 
-      // Очищаем поля формы после регистрации
-      this.username = '';
-      this.email = '';
-      this.password = '';
-      this.confirmPassword = '';
-
-      // После успешной регистрации перенаправляем пользователя на страницу авторизации
-      this.$router.push('/login');
     },
-    goBack() {
-      // Переходим на главную страницу
-      // Здесь необходимо реализовать навигацию с помощью маршрутизатора Vue Router
-      console.log('Перенаправлен на главный экран');
-
-      // Пример перехода на главную страницу с использованием маршрутизатора Vue Router
+    goBack(){
       this.$router.push('/');
-    },
+    }
+
   }
-};
+}
 </script>
 
 <!--<style scoped>-->

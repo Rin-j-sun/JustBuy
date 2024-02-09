@@ -8,9 +8,9 @@
         <div v-if="emailError" class="error">Введите корректный адрес электронной почты</div>
       </div>
       <div class="form-group">
-        <label for="password">Пароль:</label>
-        <input type="password" id="password" v-model="password" required :class="{ 'error': passwordError }">
-        <div v-if="passwordError" class="error">Введите пароль</div>
+        <label for="confirmPassword">Пароль:</label>
+        <input type="confirmPassword" id="confirmPassword" v-model="confirmPassword" required :class="{ 'error': confirmPasswordError }">
+        <div v-if="confirmPasswordError" class="error">Введите пароль</div>
       </div>
       <div v-if="error" class="error">{{ error }}</div>
       <button type="submit" class="login-button">Войти</button>
@@ -23,47 +23,42 @@
 export default {
   data() {
     return {
+
       email: '',
-      password: '',
-      emailError: false,
-      passwordError: false,
-      error: ''
-    };
+      confirmPassword: '',
+      error: '',
+      isAuthenticated: false,
+    }
   },
   methods: {
-    async loginUser() {
-      const url = "https://jurapro.bhuser.ru/api-shop";
-      // Получаем данные пользователя из локального хранилища
-      // const savedUserData = localStorage.getItem('userData');
-      const response = await fetch(url  + '/login' ,   {
-        method: "POST",
+    async login() {
+      const url = "https://jurapro.bhuser.ru/api-shop/login";
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
           email: this.email,
-          password: this.password
+          confirmPassword: this.confirmPassword
         })
-      })
-      const result = await response.json();
-      // перенаправление пользователя на главную страницу
-      this.$router.push('/')
-      console.log('response: ', result);
-      // if (savedUserData) {
-      //   const userData = JSON.parse(savedUserData);
-      //   if (userData.email === this.email && userData.password === this.password) {
-      //
-      //     this.$router.push('/'); // Перенаправляем пользователя на главную страницу
-      //   } else {
-      //     this.error = 'Неверные учетные данные';
-      //   }
-      // } else {
-      //   this.error = 'Пользователь не найден';
-      // }
+      });
+      if (response.ok) {
+        const userToken = await response.json();
+        localStorage.setItem('userToken', userToken.data.user_token);
+        this.$router.push('/'); // Перенаправляем пользователя на главную страницу
+      } else {
+        this.error = "Неверные учетные данные";
+        console.error('Ошибка:', this.error);
+      }
+      this.isAuthenticated = true
     },
-    goBack() {
-      // Переходим на главную страницу
+    goBack(){
       this.$router.push('/');
     }
+
   }
-};
+}
 </script>
 
 <!--<style>-->

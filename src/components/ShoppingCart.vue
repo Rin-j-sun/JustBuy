@@ -24,60 +24,111 @@
   </div>
 </template>
 
-<script>
+<script >
+
 export default {
+  name: 'Cart',
   data() {
     return {
-      cartItems: [] // Список товаров в корзине
+      productsCart: [],
+      myOrder:[]
     };
   },
+  created() {
+    this.getProductCart();
+  },
   methods: {
-    incrementItem(index) {
-      this.cartItems[index].quantity++;
-      this.saveCart();
+    async getProductCart(){
+      const localToken = localStorage.getItem('userToken');
+      if(!localToken){
+        console.error('Токен отсутствует');
+        return;
+      }
+      const url = "https://jurapro.bhuser.ru/api-shop/cart";
+      const response = await fetch(url,{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": `Bearer ${localToken}`
+        },
+
+      });
+      if (response.ok) {
+        const result = await response.json();
+        this.productsCart = result.data
+
+        console.log('Result: ', result)
+
+      } else {
+        this.error = "Ошибка";
+        console.error(this.error);
+      }
+
+
     },
-    decrementItem(index) {
-      if (this.cartItems[index].quantity > 1) {
-        this.cartItems[index].quantity--;
-        this.saveCart();
+    async removeFromCart(product) {
+
+      const userToken = localStorage.getItem('userToken');
+      if (!userToken) {
+        console.error('Токен отсутствует');
+        return;
+      }
+
+      const url = `https://jurapro.bhuser.ru/api-shop/cart/${product.id}`;
+      try {
+        const response = await fetch(url, {
+          method: 'DELETE',
+          headers: {
+
+            "Authorization": `Bearer ${userToken}`
+          }
+        });
+        if (response.ok) {
+          this.productsCart = this.productsCart.filter(cartItem => cartItem.id !== product.id);
+          console.log("Товар успешно удален!");
+          const data = await response.json();
+          console.log(data.data.message);
+        } else {
+          console.error("Ошибка удаления товара из корзины:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Ошибка удаления товара из корзины:", error);
       }
     },
-    removeItem(index) {
-      this.cartItems.splice(index, 1);
-      this.saveCart();
+
+    async addToMyOrder(product) {
+      const url = 'https://jurapro.bhuser.ru/api-shop/order';
+      const userToken = localStorage.getItem('userToken');
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${userToken}`
+          }
+        });
+        if (response.ok) {
+          const existingItemIndex = this.myOrder.findIndex(item => item.id === product.id);
+          if (existingItemIndex !== -1 && this.productExists(this.myOrder[existingItemIndex], product)) {
+            this.myOrder[existingItemIndex].quantity++;
+          } else {
+            this.myOrder.push({...product});
+          }
+          const data = await response.json();
+          console.log(data.data.message);
+          this.$router.push('/order');
+        } else {
+          console.error("Ошибка добавления товара в мои заказы:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Ошибка добавления товара в мои заказы:", error);
+      }
     },
-    checkout() {
-      // Добавление текущего заказа в список оформленных заказов
-      const newOrder = {
-        id: Math.floor(Math.random() * 1000), // Генерация временного ID
-        date: new Date().toLocaleDateString(),
-        total: this.cartItems.reduce((total, item) => total + (item.quantity * item.price), 0),
-        items: this.cartItems.map(item => ({id: item.id, name: item.name, quantity: item.quantity}))
-      };
-      // Получение списка заказов из localStorage
-      let orders = JSON.parse(localStorage.getItem('orders')) || [];
-      // Добавляем новый заказ в список
-      orders.push(newOrder);
-      // Сохраняем обновленный список заказов в localStorage
-      localStorage.setItem('orders', JSON.stringify(orders));
-      // Очистка корзины после оформления заказа
-      this.cartItems = [];
-      this.saveCart();
-      // Переход на страницу с заказами
-      this.$router.push('/orders');
+    productExists(item1, item2) {
+      return item1.id === item2.id && item1.name === item2.name && item1.description === item2.description && item1.price === item2.price;
     },
-    saveCart() {
-      localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
-    }
-  },
-  created() {
-    // Загружаем корзину из localStorage при создании компонента
-    const savedCartItems = localStorage.getItem('cartItems');
-    if (savedCartItems) {
-      this.cartItems = JSON.parse(savedCartItems);
-    }
   }
-};
+}
 </script>
 
 <!--<style scoped>-->
